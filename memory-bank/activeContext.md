@@ -1,7 +1,7 @@
 # Active Context: WeAreDevelopers Conference Talk Rating Dashboard
 
 ## Current Work Focus
-**Memory Bank Initialization**: Creating foundational documentation for project continuity after memory resets. This is the first time establishing the Memory Bank structure for this fully functional conference rating application.
+**Angular Upgrade Completed**: Successfully upgraded frontend from Angular 17.0.0 to Angular 20.1.0, including dependency updates and code modernization for latest patterns.
 
 ## Project Current State
 **Status**: Fully functional MVP with all core features implemented and working
@@ -10,7 +10,7 @@
 - **Complete Authentication Flow**: JWT-based login/signup with token management
 - **Talk Display System**: Conference talks organized chronologically by date
 - **Rating Functionality**: 1-5 star rating system with real-time updates
-- **User Interface**: Material Design responsive UI with Angular 17
+- **User Interface**: Material Design responsive UI with Angular 20
 - **Data Management**: H2 database with sample conference data pre-loaded
 - **API Integration**: Full REST API communication between frontend and backend
 
@@ -23,11 +23,11 @@ Based on examination of project files:
    - Controllers: RESTful endpoints for auth, talks, and ratings
    - Security: JWT implementation with Spring Security integration
 
-2. **Frontend Architecture**: Modern Angular 17 with standalone components
+2. **Frontend Architecture**: Modern Angular 20 with standalone components
    - Services: AuthService and TalkService for state management
    - Components: Login, TalkList, StarRating with Material Design
-   - Guards: Route protection with AuthGuard
-   - Interceptors: Automatic JWT token attachment
+   - Guards: Functional guards (authGuard) for modern route protection
+   - Interceptors: Automatic JWT token attachment with functional interceptors
 
 3. **Data Model**: Robust relational structure
    - User ←→ Rating ←→ Talk relationships
@@ -141,9 +141,9 @@ The application includes realistic sample data representing WeAreDevelopers conf
 - ✅ projectbrief.md: Complete project foundation
 - ✅ productContext.md: Business context and user flows
 - ✅ systemPatterns.md: Technical architecture patterns
-- ✅ techContext.md: Technology stack and configuration
+- ✅ techContext.md: Technology stack and configuration (updated for Angular 20)
 - ✅ activeContext.md: Current state and focus (this document)
-- 🔄 progress.md: Next to document what works and what's remaining
+- ✅ progress.md: Updated with Angular upgrade completion
 
 ### Important Patterns for Future Reference
 - **Entity Relationships**: User-Rating-Talk triangle with unique constraints

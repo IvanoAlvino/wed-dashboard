@@ -7,7 +7,7 @@ A full-stack webapp for rating talks from the WeAreDevelopers conference, built 
 - **Java 17** or higher
 - **Maven 3.6+**
 - **Node.js 18+** and npm
-- **Angular CLI 17** (`npm install -g @angular/cli`)
+- **Angular CLI 20** (`npm install -g @angular/cli@latest`)
 
 ## Backend Setup (Spring Boot)
 
@@ -82,7 +82,7 @@ The application initializes with sample conference talks including:
 
 ## Architecture
 - **Backend**: Spring Boot 3.x with Spring Security, JPA, H2 Database
-- **Frontend**: Angular 17 with standalone components, Angular Material
+- **Frontend**: Angular 20 with standalone components, Angular Material
 - **Authentication**: JWT tokens with HTTP interceptors
 - **Database**: H2 (in-memory for development)
 

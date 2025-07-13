@@ -2,8 +2,8 @@
 
 ## Current Status: FULLY FUNCTIONAL MVP ✅
 
-**Project Phase**: Complete and operational
-**Last Updated**: Memory Bank initialization (first documentation)
+**Project Phase**: Complete and operational with latest Angular version
+**Last Updated**: Angular upgrade to version 20.1.0 completed (January 2025)
 
 ## What Works (Completed Features)
 
@@ -91,9 +91,13 @@ The application functions as designed with no blocking issues found during analy
    - **Rationale**: Zero configuration, fast iteration, easy testing
    - **Result**: Successful - immediate productivity with PostgreSQL migration path
 
-4. **Angular Standalone Components**: Used modern Angular 17 architecture
+4. **Angular Standalone Components**: Used modern Angular 17+ architecture
    - **Rationale**: Future-proof, better tree-shaking, simplified imports
    - **Result**: Successful - clean component architecture achieved
+
+6. **Angular 20 Upgrade**: Upgraded from Angular 17 to Angular 20.1.0
+   - **Rationale**: Latest features, security updates, performance improvements
+   - **Result**: Successful - modernized guard patterns and updated dependencies
 
 5. **Material Design**: Selected for UI consistency
    - **Rationale**: Professional appearance, mobile responsiveness, Angular integration

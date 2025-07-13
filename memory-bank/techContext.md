@@ -15,8 +15,9 @@
 - **JWT (JSON Web Tokens)**: Stateless authentication mechanism
 
 ### Frontend Technologies
-- **Angular 17+**: Modern web application framework
+- **Angular 20+**: Modern web application framework
   - Standalone Components: Modern component architecture
+  - Functional Guards: Modern route protection pattern
   - Angular Material: UI component library
   - Angular CLI: Development tooling
 - **TypeScript**: Type-safe JavaScript superset
@@ -45,7 +46,7 @@ mvn -version   # Should show Maven 3.6+
 node -version  # Should show Node 18+
 
 # Verify Angular CLI installation
-ng version     # Should show Angular CLI 17+
+ng version     # Should show Angular CLI 20+
 ```
 
 ### Backend Setup Process
