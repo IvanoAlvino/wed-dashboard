@@ -14,6 +14,7 @@ public class TalkResponse {
     private String description;
     private String track;
     private String room;
+    private String recordingUrl;
     private Double averageRating;
     private Long ratingCount;
     private Integer userRating;
@@ -99,6 +100,14 @@ public class TalkResponse {
     
     public void setRoom(String room) {
         this.room = room;
+    }
+    
+    public String getRecordingUrl() {
+        return recordingUrl;
+    }
+    
+    public void setRecordingUrl(String recordingUrl) {
+        this.recordingUrl = recordingUrl;
     }
     
     public Double getAverageRating() {

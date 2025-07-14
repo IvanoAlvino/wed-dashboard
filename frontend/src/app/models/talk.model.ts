@@ -8,6 +8,7 @@ export interface Talk {
   description?: string;
   track?: string;
   room?: string;
+  recordingUrl?: string;
   averageRating?: number;
   ratingCount?: number;
   userRating?: number;

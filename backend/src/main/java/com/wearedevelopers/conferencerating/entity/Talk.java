@@ -1,5 +1,6 @@
 package com.wearedevelopers.conferencerating.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -36,7 +37,7 @@ public class Talk {
     @Column(name = "end_time")
     private LocalTime endTime;
     
-    @Column(length = 1000)
+    @Column(length = 5000)
     private String description;
     
     @Size(max = 100)
@@ -45,7 +46,11 @@ public class Talk {
     @Size(max = 100)
     private String room;
     
+    @Size(max = 500)
+    private String recordingUrl;
+    
     @OneToMany(mappedBy = "talk", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Rating> ratings = new HashSet<>();
     
     public Talk() {}
@@ -128,6 +133,14 @@ public class Talk {
     
     public void setRoom(String room) {
         this.room = room;
+    }
+    
+    public String getRecordingUrl() {
+        return recordingUrl;
+    }
+    
+    public void setRecordingUrl(String recordingUrl) {
+        this.recordingUrl = recordingUrl;
     }
     
     public Set<Rating> getRatings() {

@@ -246,3 +246,54 @@ POST   /api/ratings         # Submit rating
 **Database Migration**: PostgreSQL compatibility
 - JPA annotations support multiple databases
 - Connection configuration externalized
+
+## JSON Data Integration Patterns
+
+### 1. Data Loading Architecture
+**JsonDataLoader Service**: Centralized JSON processing
+- Reads from classpath resources (`conference-data.json`)
+- Type-safe parsing with Jackson ObjectMapper
+- Transformation from complex JSON to simple entity fields
+
+### 2. JSON Mapping Pattern
+**POJO Structure**: Hierarchical data mapping
+```
+ConferenceData
+├── sessions[]
+    ├── SessionData
+    ├── SpeakerData[]
+    ├── TrackData
+    └── StageData
+```
+
+### 3. Data Transformation Pattern
+**Complex to Simple Mapping**:
+- `speakers[].full_name` → comma-separated string
+- `stage.name` → room field
+- `track.name` → track field
+- `recording_url` → recordingUrl field
+
+### 4. DateTime Processing Pattern
+**ISO 8601 Parsing**: Robust datetime handling
+```java
+DateTimeFormatter.ISO_OFFSET_DATE_TIME
+LocalDateTime.parse(dateTimeString, formatter)
+```
+
+### 5. Startup Data Loading Pattern
+**DataInitializer Integration**: JSON loading at application startup
+- Replaces hardcoded sample data
+- Fail-fast approach for malformed JSON
+- Maintains demo user creation
+
+### 6. Recording URL Integration Pattern
+**Frontend Enhancement**: Conditional UI elements
+- Recording button appears only when URL exists
+- Opens in new tab for better UX
+- Styled with gradient background and hover effects
+
+### 7. Error Handling Pattern
+**Graceful Degradation**: Robust error handling
+- Missing fields default to empty strings
+- Invalid datetime falls back to current time
+- Malformed JSON prevents application startup

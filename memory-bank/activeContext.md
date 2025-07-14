@@ -1,10 +1,10 @@
 # Active Context: WeAreDevelopers Conference Talk Rating Dashboard
 
 ## Current Work Focus
-**Angular Upgrade Completed**: Successfully upgraded frontend from Angular 17.0.0 to Angular 20.1.0, including dependency updates and code modernization for latest patterns.
+**JSON Data Integration Completed**: Successfully integrated real conference JSON data loading, replacing hardcoded sample data with dynamic JSON parsing and recording URL support.
 
 ## Project Current State
-**Status**: Fully functional MVP with all core features implemented and working
+**Status**: Fully functional MVP with JSON data integration and recording link functionality
 
 ### What's Working Now
 - **Complete Authentication Flow**: JWT-based login/signup with token management

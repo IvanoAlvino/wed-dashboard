@@ -1,9 +1,13 @@
 package com.wearedevelopers.conferencerating.controller;
 
 import com.wearedevelopers.conferencerating.dto.RatingRequest;
+import com.wearedevelopers.conferencerating.dto.RatingResponse;
+import com.wearedevelopers.conferencerating.dto.TalkRatingResponse;
+import com.wearedevelopers.conferencerating.dto.UserRatingResponse;
 import com.wearedevelopers.conferencerating.entity.Rating;
 import com.wearedevelopers.conferencerating.entity.Talk;
 import com.wearedevelopers.conferencerating.entity.User;
+import com.wearedevelopers.conferencerating.mapper.RatingMapper;
 import com.wearedevelopers.conferencerating.repository.RatingRepository;
 import com.wearedevelopers.conferencerating.repository.TalkRepository;
 import com.wearedevelopers.conferencerating.repository.UserRepository;
@@ -30,6 +34,9 @@ public class RatingController {
     
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private RatingMapper ratingMapper;
     
     @PostMapping
     public ResponseEntity<?> createOrUpdateRating(
@@ -67,11 +74,12 @@ public class RatingController {
         
         Rating savedRating = ratingRepository.save(rating);
         
-        return ResponseEntity.ok(savedRating);
+        RatingResponse response = ratingMapper.toRatingResponse(savedRating);
+        return ResponseEntity.ok(response);
     }
     
     @GetMapping("/user")
-    public ResponseEntity<List<Rating>> getUserRatings(
+    public ResponseEntity<List<UserRatingResponse>> getUserRatings(
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
         
         if (userPrincipal == null) {
@@ -82,11 +90,12 @@ public class RatingController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         
         List<Rating> userRatings = ratingRepository.findByUser(user);
-        return ResponseEntity.ok(userRatings);
+        List<UserRatingResponse> response = ratingMapper.toUserRatingResponseList(userRatings);
+        return ResponseEntity.ok(response);
     }
     
     @GetMapping("/talk/{talkId}")
-    public ResponseEntity<List<Rating>> getTalkRatings(@PathVariable Long talkId) {
+    public ResponseEntity<List<TalkRatingResponse>> getTalkRatings(@PathVariable Long talkId) {
         
         Optional<Talk> talkOpt = talkRepository.findById(talkId);
         if (talkOpt.isEmpty()) {
@@ -94,7 +103,8 @@ public class RatingController {
         }
         
         List<Rating> talkRatings = ratingRepository.findByTalk(talkOpt.get());
-        return ResponseEntity.ok(talkRatings);
+        List<TalkRatingResponse> response = ratingMapper.toTalkRatingResponseList(talkRatings);
+        return ResponseEntity.ok(response);
     }
     
     @DeleteMapping("/{ratingId}")

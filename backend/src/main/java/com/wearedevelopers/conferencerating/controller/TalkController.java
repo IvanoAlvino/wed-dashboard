@@ -109,6 +109,7 @@ public class TalkController {
         response.setDescription(talk.getDescription());
         response.setTrack(talk.getTrack());
         response.setRoom(talk.getRoom());
+        response.setRecordingUrl(talk.getRecordingUrl());
         
         // Add rating statistics
         Double avgRating = ratingRepository.findAverageRatingByTalk(talk);

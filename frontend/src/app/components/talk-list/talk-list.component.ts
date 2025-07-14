@@ -4,6 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TalkService } from '../../services/talk.service';
 import { AuthService } from '../../services/auth.service';
@@ -19,6 +20,7 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
     MatChipsModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatButtonModule,
     StarRatingComponent
   ],
   template: `
@@ -57,6 +59,13 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
                       {{talk.room}}
                     </mat-chip>
                   </mat-chip-set>
+                  
+                  <div *ngIf="talk.recordingUrl" class="recording-section">
+                    <button mat-raised-button color="accent" (click)="openRecording(talk.recordingUrl)">
+                      <mat-icon>play_circle_filled</mat-icon>
+                      Watch Recording
+                    </button>
+                  </div>
                 </div>
                 
                 <div class="rating-section">
@@ -137,6 +146,26 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
     
     .talk-meta {
       margin: 16px 0;
+    }
+    
+    .recording-section {
+      margin-top: 12px;
+    }
+    
+    .recording-section button {
+      background: linear-gradient(135deg, #ff5722 0%, #ff9800 100%);
+      color: white;
+      font-weight: 500;
+    }
+    
+    .recording-section button:hover {
+      background: linear-gradient(135deg, #e64a19 0%, #f57c00 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(255, 87, 34, 0.3);
+    }
+    
+    .recording-section mat-icon {
+      margin-right: 8px;
     }
     
     .rating-section {
@@ -270,5 +299,9 @@ export class TalkListComponent implements OnInit {
         this.snackBar.open('Failed to save rating', 'Close', { duration: 3000 });
       }
     });
+  }
+
+  openRecording(recordingUrl: string): void {
+    window.open(recordingUrl, '_blank');
   }
 }
