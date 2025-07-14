@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 import { TalkService } from '../../services/talk.service';
 import { AuthService } from '../../services/auth.service';
 import { Talk, TalksByDate } from '../../models/talk.model';
@@ -23,6 +24,26 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
     MatButtonModule,
     StarRatingComponent
   ],
+  animations: [
+    trigger('slideInOut', [
+      transition(':enter', [
+        style({ height: '0', opacity: 0, overflow: 'hidden' }),
+        animate('300ms ease-in-out', style({ height: '*', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('300ms ease-in-out', style({ height: '0', opacity: 0, overflow: 'hidden' }))
+      ])
+    ]),
+    trigger('expandDescription', [
+      transition(':enter', [
+        style({ height: '0', opacity: 0, overflow: 'hidden' }),
+        animate('200ms ease-in-out', style({ height: '*', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('200ms ease-in-out', style({ height: '0', opacity: 0, overflow: 'hidden' }))
+      ])
+    ])
+  ],
   template: `
     <div class="talk-list-container">
       <h1>WeAreDevelopers Conference Talks</h1>
@@ -32,66 +53,74 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
         <p>Loading talks...</p>
       </div>
       
-      <div *ngIf="!loading && talksByDate">
-        <div *ngFor="let dateEntry of getDateEntries()" class="date-section">
-          <div class="date-header">
-            <h2>{{formatDate(dateEntry.date)}}</h2>
+      <div *ngIf="!loading && talksByDate" class="conference-schedule">
+        <div *ngFor="let dayData of getDayEntries(); let i = index" class="day-group">
+          <div class="day-header" (click)="toggleDay(dayData.dayName)" [class.expanded]="expandedDays.has(dayData.dayName)">
+            <div class="day-header-content">
+              <mat-icon class="expand-icon">{{ expandedDays.has(dayData.dayName) ? 'expand_less' : 'expand_more' }}</mat-icon>
+              <h2>{{ dayData.dayName }}</h2>
+              <span class="talk-count">({{ dayData.talks.length }} talks)</span>
+              <span class="day-date">{{ formatDate(dayData.date) }}</span>
+            </div>
           </div>
           
-          <div class="talks-grid">
-            <mat-card *ngFor="let talk of dateEntry.talks" class="talk-card">
-              <mat-card-header>
-                <mat-card-title>{{talk.title}}</mat-card-title>
-                <mat-card-subtitle>
-                  by {{talk.speaker}} • {{formatTime(talk.startTime)}}
-                  <span *ngIf="talk.endTime"> - {{formatTime(talk.endTime)}}</span>
-                </mat-card-subtitle>
-              </mat-card-header>
+          <div class="talks-list" *ngIf="expandedDays.has(dayData.dayName)" [@slideInOut]>
+            <div *ngFor="let talk of dayData.talks; let odd = odd" 
+                 class="talk-row" 
+                 [class.odd]="odd"
+                 [class.expanded]="expandedTalks.has(talk.id)">
               
-              <mat-card-content>
-                <p *ngIf="talk.description">{{talk.description}}</p>
-                
-                <div class="talk-meta">
-                  <mat-chip-set *ngIf="talk.track || talk.room">
-                    <mat-chip *ngIf="talk.track" color="primary">{{talk.track}}</mat-chip>
-                    <mat-chip *ngIf="talk.room">
-                      <mat-icon>location_on</mat-icon>
-                      {{talk.room}}
-                    </mat-chip>
-                  </mat-chip-set>
-                  
-                  <div *ngIf="talk.recordingUrl" class="recording-section">
-                    <button mat-raised-button color="accent" (click)="openRecording(talk.recordingUrl)">
-                      <mat-icon>play_circle_filled</mat-icon>
-                      Watch Recording
-                    </button>
-                  </div>
+              <div class="talk-main-info">
+                <div class="talk-time">{{ formatTime(talk.startTime) }}</div>
+                <div class="talk-details">
+                  <div class="talk-title">{{ talk.title }}</div>
+                  <div class="talk-speaker">by {{ talk.speaker }}</div>
                 </div>
-                
-                <div class="rating-section">
-                  <div class="current-rating" *ngIf="talk.averageRating">
-                    <span class="average-rating">
+                <div class="talk-meta-inline">
+                  <span *ngIf="talk.track" class="track-chip">{{ talk.track }}</span>
+                  <span *ngIf="talk.room" class="room-chip">
+                    <mat-icon>location_on</mat-icon>{{ talk.room }}
+                  </span>
+                </div>
+                <div class="talk-actions">
+                  <div class="rating-inline">
+                    <div *ngIf="talk.averageRating" class="average-rating">
                       <mat-icon>star</mat-icon>
-                      {{talk.averageRating | number:'1.1-1'}}
-                    </span>
-                    <span class="rating-count">({{talk.ratingCount}} ratings)</span>
+                      {{ talk.averageRating | number:'1.1-1' }}
+                      <span class="rating-count">({{ talk.ratingCount }})</span>
+                    </div>
+                    <div *ngIf="isLoggedIn()" class="user-rating-inline">
+                      <app-star-rating 
+                        [rating]="talk.userRating || 0"
+                        [interactive]="true"
+                        [size]="'small'"
+                        (ratingChange)="onRatingChange(talk, $event)">
+                      </app-star-rating>
+                    </div>
                   </div>
-                  
-                  <div *ngIf="isLoggedIn()" class="user-rating">
-                    <span>Your rating:</span>
-                    <app-star-rating 
-                      [rating]="talk.userRating || 0"
-                      [interactive]="true"
-                      (ratingChange)="onRatingChange(talk, $event)">
-                    </app-star-rating>
-                  </div>
-                  
-                  <div *ngIf="!isLoggedIn()" class="login-prompt">
-                    <span>Login to rate this talk</span>
-                  </div>
+                  <button *ngIf="talk.description" 
+                          class="read-more-btn" 
+                          (click)="toggleDescription(talk.id); $event.stopPropagation()">
+                    {{ expandedTalks.has(talk.id) ? 'Read less' : 'Read more' }}
+                  </button>
+                  <button *ngIf="talk.recordingUrl" 
+                          class="recording-btn" 
+                          (click)="openRecording(talk.recordingUrl); $event.stopPropagation()">
+                    <mat-icon>play_circle_filled</mat-icon>
+                    Watch
+                  </button>
                 </div>
-              </mat-card-content>
-            </mat-card>
+              </div>
+              
+              <div *ngIf="expandedTalks.has(talk.id) && talk.description" 
+                   class="talk-description" 
+                   [@expandDescription]>
+                <p>{{ talk.description }}</p>
+                <div *ngIf="!isLoggedIn()" class="login-prompt">
+                  <span>Login to rate this talk</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -100,6 +129,8 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
   styles: [`
     .talk-list-container {
       padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
     
     .loading-spinner {
@@ -111,116 +142,273 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
       gap: 16px;
     }
     
-    .date-section {
-      margin-bottom: 32px;
+    .conference-schedule {
+      margin-top: 24px;
     }
     
-    .date-header {
-      background: linear-gradient(135deg, #673ab7 0%, #9c27b0 100%);
+    .day-group {
+      margin-bottom: 24px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .day-header {
+      background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
       color: white;
       padding: 16px 24px;
-      margin-bottom: 16px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      user-select: none;
     }
     
-    .date-header h2 {
+    .day-header:hover {
+      background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+    }
+    
+    .day-header.expanded {
+      box-shadow: inset 0 -2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .day-header-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .expand-icon {
+      transition: transform 0.2s ease-in-out;
+    }
+    
+    .day-header h2 {
       margin: 0;
-      font-weight: 300;
+      font-weight: 500;
+      font-size: 1.4em;
     }
     
-    .talks-grid {
+    .talk-count {
+      font-size: 0.9em;
+      opacity: 0.9;
+    }
+    
+    .day-date {
+      margin-left: auto;
+      font-size: 0.9em;
+      opacity: 0.9;
+    }
+    
+    .talks-list {
+      background: #fafafa;
+    }
+    
+    .talk-row {
+      background: white;
+      border-bottom: 1px solid #e0e0e0;
+      transition: all 0.2s ease-in-out;
+    }
+    
+    .talk-row:last-child {
+      border-bottom: none;
+    }
+    
+    .talk-row.odd {
+      background: #f8f9fa;
+    }
+    
+    .talk-row:hover {
+      background: #e3f2fd;
+      transform: translateX(2px);
+    }
+    
+    .talk-main-info {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      grid-template-columns: 80px 1fr auto auto;
       gap: 16px;
+      padding: 16px 24px;
+      align-items: center;
     }
     
-    .talk-card {
-      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    .talk-time {
+      font-weight: 600;
+      color: #1976d2;
+      font-size: 0.95em;
+      text-align: center;
+      padding: 4px 8px;
+      background: #e3f2fd;
+      border-radius: 4px;
     }
     
-    .talk-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    .talk-details {
+      min-width: 0;
     }
     
-    .talk-meta {
-      margin: 16px 0;
+    .talk-title {
+      font-weight: 600;
+      font-size: 1.05em;
+      color: #212121;
+      margin-bottom: 4px;
+      line-height: 1.3;
     }
     
-    .recording-section {
-      margin-top: 12px;
+    .talk-speaker {
+      color: #666;
+      font-size: 0.9em;
     }
     
-    .recording-section button {
-      background: linear-gradient(135deg, #ff5722 0%, #ff9800 100%);
-      color: white;
+    .talk-meta-inline {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .track-chip {
+      background: #e8f5e8;
+      color: #2e7d32;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8em;
       font-weight: 500;
     }
     
-    .recording-section button:hover {
-      background: linear-gradient(135deg, #e64a19 0%, #f57c00 100%);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(255, 87, 34, 0.3);
-    }
-    
-    .recording-section mat-icon {
-      margin-right: 8px;
-    }
-    
-    .rating-section {
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid #e0e0e0;
-    }
-    
-    .current-rating {
+    .room-chip {
+      background: #fff3e0;
+      color: #f57c00;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: 500;
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 4px;
+    }
+    
+    .room-chip mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+    
+    .talk-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .rating-inline {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
     }
     
     .average-rating {
       display: flex;
       align-items: center;
       gap: 4px;
-      font-weight: 500;
+      font-size: 0.85em;
       color: #ff9800;
+      font-weight: 500;
     }
     
-    .rating-count {
-      font-size: 12px;
-      color: #666;
-    }
-    
-    .user-rating {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    
-    .login-prompt {
-      font-size: 12px;
-      color: #666;
-      font-style: italic;
-    }
-    
-    mat-chip {
-      margin-right: 8px;
-    }
-    
-    mat-chip mat-icon {
+    .average-rating mat-icon {
       font-size: 16px;
       width: 16px;
       height: 16px;
+    }
+    
+    .rating-count {
+      font-size: 0.75em;
+      color: #999;
+    }
+    
+    .user-rating-inline {
+      margin-top: 2px;
+    }
+    
+    .read-more-btn {
+      background: none;
+      border: 1px solid #2196f3;
+      color: #2196f3;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8em;
+      transition: all 0.2s ease-in-out;
+    }
+    
+    .read-more-btn:hover {
+      background: #2196f3;
+      color: white;
+    }
+    
+    .recording-btn {
+      background: #ff5722;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8em;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease-in-out;
+    }
+    
+    .recording-btn:hover {
+      background: #e64a19;
+      transform: translateY(-1px);
+    }
+    
+    .recording-btn mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+    
+    .talk-description {
+      padding: 16px 24px;
+      background: #f5f5f5;
+      border-top: 1px solid #e0e0e0;
+    }
+    
+    .talk-description p {
+      margin: 0 0 12px 0;
+      line-height: 1.5;
+      color: #424242;
+    }
+    
+    .login-prompt {
+      font-size: 0.85em;
+      color: #666;
+      font-style: italic;
+      margin-top: 8px;
+    }
+    
+    @media (max-width: 768px) {
+      .talk-main-info {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      
+      .talk-actions {
+        justify-content: space-between;
+      }
+      
+      .talk-meta-inline {
+        justify-content: flex-start;
+      }
     }
   `]
 })
 export class TalkListComponent implements OnInit {
   talksByDate: TalksByDate | null = null;
   loading = true;
+  expandedDays: Set<string> = new Set(['Day 1', 'Day 2', 'Day 3']); // All expanded by default
+  expandedTalks: Set<number> = new Set();
+  dayEntries: { dayName: string; date: string; talks: Talk[] }[] = [];
 
   constructor(
     private talkService: TalkService,
@@ -237,6 +425,7 @@ export class TalkListComponent implements OnInit {
     this.talkService.getAllTalks().subscribe({
       next: (data) => {
         this.talksByDate = data;
+        this.dayEntries = this.buildDayEntries();
         this.loading = false;
       },
       error: (error) => {
@@ -246,17 +435,40 @@ export class TalkListComponent implements OnInit {
     });
   }
 
-  getDateEntries(): { date: string; talks: Talk[] }[] {
-    if (!this.talksByDate) return [];
+  private buildDayEntries(): { dayName: string; date: string; talks: Talk[] }[] {
+    if (!this.talksByDate) {
+      return [];
+    }
     
-    return Object.keys(this.talksByDate)
-      .sort()
-      .map(date => ({
-        date,
-        talks: this.talksByDate![date].sort((a, b) => 
-          a.startTime.localeCompare(b.startTime)
-        )
-      }));
+    const sortedDates = Object.keys(this.talksByDate).sort();
+    
+    return sortedDates.map((date, index) => ({
+      dayName: `Day ${index + 1}`,
+      date,
+      talks: this.talksByDate![date].sort((a, b) => 
+        a.startTime.localeCompare(b.startTime)
+      )
+    }));
+  }
+
+  getDayEntries(): { dayName: string; date: string; talks: Talk[] }[] {
+    return this.dayEntries;
+  }
+
+  toggleDay(dayName: string): void {
+    if (this.expandedDays.has(dayName)) {
+      this.expandedDays.delete(dayName);
+    } else {
+      this.expandedDays.add(dayName);
+    }
+  }
+
+  toggleDescription(talkId: number): void {
+    if (this.expandedTalks.has(talkId)) {
+      this.expandedTalks.delete(talkId);
+    } else {
+      this.expandedTalks.add(talkId);
+    }
   }
 
   formatDate(dateStr: string): string {
@@ -304,4 +516,7 @@ export class TalkListComponent implements OnInit {
   openRecording(recordingUrl: string): void {
     window.open(recordingUrl, '_blank');
   }
+
+  // Helper method to expose Object.keys to template
+  Object = Object;
 }
