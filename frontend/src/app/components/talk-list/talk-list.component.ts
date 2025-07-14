@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { TalkService } from '../../services/talk.service';
@@ -53,7 +54,13 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
   ],
   template: `
     <div class="talk-list-container">
-      <h1>WeAreDevelopers Conference Talks</h1>
+      <div class="header-section">
+        <h1>WeAreDevelopers Conference Talks</h1>
+        <button mat-raised-button color="accent" class="popular-talks-btn" (click)="goToPopularTalks()">
+          <mat-icon>trending_up</mat-icon>
+          View Popular Talks
+        </button>
+      </div>
       
       <!-- Search Section -->
       <div *ngIf="!loading && talksByDate" class="search-section">
@@ -160,6 +167,35 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
       padding: 20px;
       max-width: 1200px;
       margin: 0 auto;
+    }
+    
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .header-section h1 {
+      margin: 0;
+      color: #1976d2;
+      font-size: 2em;
+      font-weight: 500;
+    }
+    
+    .popular-talks-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+    
+    .popular-talks-btn mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
     }
     
     .search-section {
@@ -489,7 +525,8 @@ export class TalkListComponent implements OnInit {
   constructor(
     private talkService: TalkService,
     private authService: AuthService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -669,6 +706,10 @@ export class TalkListComponent implements OnInit {
     if (!dataToUse) return 0;
 
     return Object.values(dataToUse).reduce((total, talks) => total + talks.length, 0);
+  }
+
+  goToPopularTalks(): void {
+    this.router.navigate(['/popular']);
   }
 
   // Helper method to expose Object.keys to template

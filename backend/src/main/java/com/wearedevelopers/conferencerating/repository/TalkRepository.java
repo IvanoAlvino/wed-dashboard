@@ -20,4 +20,7 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
     List<Talk> findAllOrderByDateAndTime();
     
     List<Talk> findByTrackOrderByDateAscStartTimeAsc(String track);
+    
+    @Query("SELECT t FROM Talk t WHERE EXISTS (SELECT 1 FROM Rating r WHERE r.talk = t) ORDER BY (SELECT AVG(r.rating) FROM Rating r WHERE r.talk = t) DESC, (SELECT COUNT(r) FROM Rating r WHERE r.talk = t) DESC")
+    List<Talk> findTalksWithRatingsOrderByPopularity();
 }

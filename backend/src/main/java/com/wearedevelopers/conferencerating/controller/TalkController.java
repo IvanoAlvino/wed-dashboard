@@ -98,6 +98,25 @@ public class TalkController {
         return ResponseEntity.ok(talkResponse);
     }
     
+    @GetMapping("/popular")
+    public ResponseEntity<List<TalkResponse>> getPopularTalks(
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        
+        List<Talk> talks = talkRepository.findTalksWithRatingsOrderByPopularity();
+        User currentUser = null;
+        
+        if (userPrincipal != null) {
+            currentUser = userRepository.findByUsername(userPrincipal.getUsername()).orElse(null);
+        }
+        
+        final User finalCurrentUser = currentUser;
+        List<TalkResponse> talkResponses = talks.stream()
+                .map(talk -> convertToTalkResponse(talk, finalCurrentUser))
+                .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(talkResponses);
+    }
+    
     private TalkResponse convertToTalkResponse(Talk talk, User currentUser) {
         TalkResponse response = new TalkResponse();
         response.setId(talk.getId());

@@ -35,4 +35,8 @@ export class TalkService {
   getTalkRatings(talkId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.API_URL}/ratings/talk/${talkId}`);
   }
+
+  getPopularTalks(): Observable<Talk[]> {
+    return this.http.get<Talk[]>(`${this.API_URL}/talks/popular`);
+  }
 }
