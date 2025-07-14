@@ -20,74 +20,8 @@ import { AuthService } from '../../services/auth.service';
     MatInputModule,
     MatButtonModule
   ],
-  template: `
-    <div class="login-container">
-      <mat-card>
-        <mat-card-header>
-          <mat-card-title>Login to Rate Talks</mat-card-title>
-        </mat-card-header>
-        
-        <mat-card-content>
-          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-            <mat-form-field appearance="outline">
-              <mat-label>Username</mat-label>
-              <input matInput formControlName="username" required>
-              <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
-                Username is required
-              </mat-error>
-            </mat-form-field>
-            
-            <mat-form-field appearance="outline">
-              <mat-label>Password</mat-label>
-              <input matInput type="password" formControlName="password" required>
-              <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
-                Password is required
-              </mat-error>
-            </mat-form-field>
-            
-            <button mat-raised-button color="primary" type="submit" 
-                    [disabled]="loginForm.invalid || isLoading">
-              {{isLoading ? 'Logging in...' : 'Login'}}
-            </button>
-          </form>
-          
-          <div class="demo-info">
-            <p><strong>Demo Credentials:</strong></p>
-            <p>Username: <code>demo</code> | Password: <code>password</code></p>
-            <p>Username: <code>admin</code> | Password: <code>password</code></p>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  `,
-  styles: [`
-    .login-container {
-      max-width: 400px;
-      margin: 50px auto;
-      padding: 20px;
-    }
-    
-    .login-form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      margin-top: 20px;
-    }
-    
-    .demo-info {
-      margin-top: 20px;
-      padding: 16px;
-      background-color: #f5f5f5;
-      border-radius: 4px;
-      font-size: 14px;
-    }
-    
-    .demo-info code {
-      background-color: #e0e0e0;
-      padding: 2px 4px;
-      border-radius: 2px;
-    }
-  `]
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
   loginForm: FormGroup;

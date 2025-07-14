@@ -1,0 +1,108 @@
+<div class="talk-list-container">
+  <div class="header-section">
+    <h1>WeAreDevelopers Conference Talks</h1>
+    <button mat-raised-button color="accent" class="popular-talks-btn" (click)="goToPopularTalks()">
+      <mat-icon>trending_up</mat-icon>
+      View Popular Talks
+    </button>
+  </div>
+  
+  <!-- Search Section -->
+  <div *ngIf="!loading && talksByDate" class="search-section">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search talks by title...</mat-label>
+      <input matInput [formControl]="searchControl">
+      <mat-icon matPrefix>search</mat-icon>
+      <button *ngIf="searchTerm" matSuffix mat-icon-button (click)="clearSearch()" type="button">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+    
+    <div *ngIf="searchTerm" class="search-results-info">
+      Found {{ getTotalFilteredTalks() }} talks matching "{{ searchTerm }}"
+    </div>
+    
+    <div *ngIf="searchTerm && getTotalFilteredTalks() === 0" class="no-results">
+      <mat-icon>search_off</mat-icon>
+      <p>No talks found matching "{{ searchTerm }}"</p>
+      <button mat-button (click)="clearSearch()">Clear search</button>
+    </div>
+  </div>
+  
+  <div *ngIf="loading" class="loading-spinner">
+    <mat-spinner></mat-spinner>
+    <p>Loading talks...</p>
+  </div>
+  
+  <div *ngIf="!loading && talksByDate" class="conference-schedule">
+    <div *ngFor="let dayData of getDayEntries(); let i = index" class="day-group">
+      <div class="day-header" (click)="toggleDay(dayData.dayName)" [class.expanded]="expandedDays.has(dayData.dayName)">
+        <div class="day-header-content">
+          <mat-icon class="expand-icon">{{ expandedDays.has(dayData.dayName) ? 'expand_less' : 'expand_more' }}</mat-icon>
+          <h2>{{ dayData.dayName }}</h2>
+          <span class="talk-count">({{ dayData.talks.length }} talks)</span>
+          <span class="day-date">{{ formatDate(dayData.date) }}</span>
+        </div>
+      </div>
+      
+      <div class="talks-list" *ngIf="expandedDays.has(dayData.dayName)" [@slideInOut]>
+        <div *ngFor="let talk of dayData.talks; let odd = odd" 
+             class="talk-row" 
+             [class.odd]="odd"
+             [class.expanded]="expandedTalks.has(talk.id)">
+          
+          <div class="talk-main-info">
+            <div class="talk-time">{{ formatTime(talk.startTime) }}</div>
+            <div class="talk-details">
+              <div class="talk-title" [innerHTML]="highlightMatch(talk.title, searchTerm)"></div>
+              <div class="talk-speaker">by {{ talk.speaker }}</div>
+            </div>
+            <div class="talk-meta-inline">
+              <span *ngIf="talk.track" class="track-chip">{{ talk.track }}</span>
+              <span *ngIf="talk.room" class="room-chip">
+                <mat-icon>location_on</mat-icon>{{ talk.room }}
+              </span>
+            </div>
+            <div class="talk-actions">
+              <div class="rating-inline">
+                <div *ngIf="talk.averageRating" class="average-rating">
+                  <mat-icon>star</mat-icon>
+                  {{ talk.averageRating | number:'1.1-1' }}
+                  <span class="rating-count">({{ talk.ratingCount }})</span>
+                </div>
+                <div *ngIf="isLoggedIn()" class="user-rating-inline">
+                  <app-star-rating 
+                    [rating]="talk.userRating || 0"
+                    [interactive]="true"
+                    [size]="'small'"
+                    (ratingChange)="onRatingChange(talk, $event)">
+                  </app-star-rating>
+                </div>
+              </div>
+              <button *ngIf="talk.description" 
+                      class="read-more-btn" 
+                      (click)="toggleDescription(talk.id); $event.stopPropagation()">
+                {{ expandedTalks.has(talk.id) ? 'Read less' : 'Read more' }}
+              </button>
+              <button *ngIf="talk.recordingUrl" 
+                      class="recording-btn" 
+                      (click)="openRecording(talk.recordingUrl); $event.stopPropagation()">
+                <mat-icon>play_circle_filled</mat-icon>
+                Watch
+              </button>
+            </div>
+          </div>
+          
+          <div *ngIf="expandedTalks.has(talk.id) && talk.description" 
+               class="talk-description" 
+               [@expandDescription]>
+            <p>{{ talk.description }}</p>
+            <div *ngIf="!isLoggedIn()" class="login-prompt">
+              <span>Login to rate this talk</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

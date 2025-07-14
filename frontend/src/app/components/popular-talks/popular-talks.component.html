@@ -1,0 +1,110 @@
+<div class="popular-talks-container">
+  <div class="header-section">
+    <div>
+      <button mat-button class="back-button" (click)="goToSchedule()">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Schedule
+      </button>
+      <h1>Most Popular Talks</h1>
+      <p class="subtitle">Talks ranked by rating and popularity</p>
+    </div>
+  </div>
+  
+  <!-- Search Section -->
+  <div *ngIf="!loading && talks.length > 0" class="search-section">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search popular talks by title...</mat-label>
+      <input matInput [formControl]="searchControl">
+      <mat-icon matPrefix>search</mat-icon>
+      <button *ngIf="searchTerm" matSuffix mat-icon-button (click)="clearSearch()" type="button">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+    
+    <div *ngIf="searchTerm" class="search-results-info">
+      Found {{ filteredTalks.length }} talks matching "{{ searchTerm }}"
+    </div>
+    
+    <div *ngIf="searchTerm && filteredTalks.length === 0" class="no-results">
+      <mat-icon>search_off</mat-icon>
+      <p>No talks found matching "{{ searchTerm }}"</p>
+      <button mat-button (click)="clearSearch()">Clear search</button>
+    </div>
+  </div>
+  
+  <div *ngIf="loading" class="loading-spinner">
+    <mat-spinner></mat-spinner>
+    <p>Loading popular talks...</p>
+  </div>
+  
+  <div *ngIf="!loading && talks.length === 0" class="no-popular-talks">
+    <mat-icon>star_border</mat-icon>
+    <h2>No Popular Talks Yet</h2>
+    <p>No talks have received ratings yet. Be the first to rate some talks!</p>
+    <button mat-raised-button color="primary" (click)="goToSchedule()">
+      Go to Schedule
+    </button>
+  </div>
+  
+  <div *ngIf="!loading && talks.length > 0" class="popular-talks-list">
+    <div *ngFor="let talk of getDisplayTalks(); let i = index" 
+         class="talk-item" 
+         [class.expanded]="expandedTalks.has(talk.id)">
+      
+      <div class="talk-main-info">
+        <div class="rank-number">{{ i + 1 }}</div>
+        <div class="talk-time">{{ formatTime(talk.startTime) }}</div>
+        <div class="talk-details">
+          <div class="talk-title" [innerHTML]="highlightMatch(talk.title, searchTerm)"></div>
+          <div class="talk-speaker">by {{ talk.speaker }}</div>
+          <div class="talk-date">{{ formatDate(talk.date) }}</div>
+        </div>
+        <div class="talk-meta-inline">
+          <span *ngIf="talk.track" class="track-chip">{{ talk.track }}</span>
+          <span *ngIf="talk.room" class="room-chip">
+            <mat-icon>location_on</mat-icon>{{ talk.room }}
+          </span>
+        </div>
+        <div class="talk-actions">
+          <div class="rating-section">
+            <div class="average-rating">
+              <mat-icon>star</mat-icon>
+              {{ talk.averageRating | number:'1.1-1' }}
+              <span class="rating-count">({{ talk.ratingCount }} votes)</span>
+            </div>
+            <div *ngIf="isLoggedIn()" class="user-rating-inline">
+              <app-star-rating 
+                [rating]="talk.userRating || 0"
+                [interactive]="true"
+                [size]="'small'"
+                (ratingChange)="onRatingChange(talk, $event)">
+              </app-star-rating>
+            </div>
+          </div>
+          <div class="action-buttons">
+            <button *ngIf="talk.description" 
+                    class="read-more-btn" 
+                    (click)="toggleDescription(talk.id); $event.stopPropagation()">
+              {{ expandedTalks.has(talk.id) ? 'Read less' : 'Read more' }}
+            </button>
+            <button *ngIf="talk.recordingUrl" 
+                    class="recording-btn" 
+                    (click)="openRecording(talk.recordingUrl); $event.stopPropagation()">
+              <mat-icon>play_circle_filled</mat-icon>
+              Watch
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="expandedTalks.has(talk.id) && talk.description" 
+           class="talk-description" 
+           [@expandDescription]>
+        <p>{{ talk.description }}</p>
+        <div *ngIf="!isLoggedIn()" class="login-prompt">
+          <span>Login to rate this talk</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

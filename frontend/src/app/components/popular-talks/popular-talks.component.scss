@@ -1,0 +1,347 @@
+.popular-talks-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.back-button {
+  color: #2196f3;
+  padding: 0;
+}
+
+h1 {
+  margin: 0 0 8px 0;
+  color: #1976d2;
+  font-size: 2.2em;
+  font-weight: 500;
+}
+
+.subtitle {
+  margin: 0;
+  color: #666;
+  font-size: 1.1em;
+  font-style: italic;
+}
+
+.search-section {
+  margin-bottom: 24px;
+  
+  .search-field {
+    width: 100%;
+  }
+  
+  .search-results-info {
+    margin-top: 8px;
+    color: #666;
+    font-size: 0.9em;
+    font-style: italic;
+  }
+  
+  .no-results {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+    
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    p {
+      margin: 0 0 16px 0;
+      font-size: 1.1em;
+    }
+  }
+}
+
+.search-highlight {
+  background-color: #ffeb3b;
+  font-weight: 600;
+  padding: 1px 2px;
+  border-radius: 2px;
+  color: #333;
+}
+
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  gap: 16px;
+}
+
+.no-popular-talks {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+  
+  mat-icon {
+    font-size: 72px;
+    width: 72px;
+    height: 72px;
+    margin-bottom: 24px;
+    opacity: 0.3;
+  }
+  
+  h2 {
+    margin: 0 0 16px 0;
+    font-size: 1.8em;
+    color: #424242;
+  }
+  
+  p {
+    margin: 0 0 32px 0;
+    font-size: 1.1em;
+    line-height: 1.5;
+  }
+}
+
+.popular-talks-list {
+  margin-top: 24px;
+}
+
+.talk-item {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: all 0.2s ease-in-out;
+  overflow: hidden;
+}
+
+.talk-main-info {
+  display: grid;
+  grid-template-columns: 40px 80px 1fr auto auto;
+  gap: 16px;
+  padding: 20px 24px;
+  align-items: center;
+}
+
+.rank-number {
+  font-size: 1.4em;
+  font-weight: 700;
+  color: #ff9800;
+  text-align: center;
+  background: #fff3e0;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.talk-time {
+  font-weight: 600;
+  color: #1976d2;
+  font-size: 0.95em;
+  text-align: center;
+  padding: 4px 8px;
+  background: #e3f2fd;
+  border-radius: 4px;
+}
+
+.talk-details {
+  min-width: 0;
+}
+
+.talk-title {
+  font-weight: 600;
+  font-size: 1.1em;
+  color: #212121;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.talk-speaker {
+  color: #666;
+  font-size: 0.9em;
+  margin-bottom: 2px;
+}
+
+.talk-date {
+  color: #999;
+  font-size: 0.8em;
+}
+
+.talk-meta-inline {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.track-chip {
+  background: #e8f5e8;
+  color: #2e7d32;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: 500;
+}
+
+.room-chip {
+  background: #fff3e0;
+  color: #f57c00;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.room-chip mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.talk-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.rating-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.average-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 1em;
+  color: #ff9800;
+  font-weight: 600;
+  background: #fff8e1;
+  padding: 6px 12px;
+  border-radius: 16px;
+}
+
+.average-rating mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.rating-count {
+  font-size: 0.8em;
+  color: #f57c00;
+  margin-left: 4px;
+}
+
+.user-rating-inline {
+  margin-top: 4px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.read-more-btn {
+  background: none;
+  border: 1px solid #2196f3;
+  color: #2196f3;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8em;
+  transition: all 0.2s ease-in-out;
+}
+
+.read-more-btn:hover {
+  background: #2196f3;
+  color: white;
+}
+
+.recording-btn {
+  background: #ff5722;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease-in-out;
+}
+
+.recording-btn:hover {
+  background: #e64a19;
+  transform: translateY(-1px);
+}
+
+.recording-btn mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.talk-description {
+  padding: 20px 24px;
+  background: #f5f5f5;
+  border-top: 1px solid #e0e0e0;
+}
+
+.talk-description p {
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+  color: #424242;
+}
+
+.login-prompt {
+  font-size: 0.85em;
+  color: #666;
+  font-style: italic;
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .back-button {
+    position: relative;
+    left: 0;
+    top: 0;
+    margin-bottom: 16px;
+  }
+  
+  .talk-main-info {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    text-align: center;
+  }
+  
+  .talk-actions {
+    align-items: center;
+  }
+  
+  .action-buttons {
+    justify-content: center;
+  }
+  
+  .talk-meta-inline {
+    justify-content: center;
+  }
+}
