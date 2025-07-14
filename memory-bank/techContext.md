@@ -18,10 +18,11 @@
 - **Angular 20+**: Modern web application framework
   - Standalone Components: Modern component architecture
   - Functional Guards: Modern route protection pattern
-  - Angular Material: UI component library
+  - Angular Material: UI component library (including form fields and input components)
   - Angular CLI: Development tooling
+  - Reactive Forms: FormControl and reactive form handling
 - **TypeScript**: Type-safe JavaScript superset
-- **RxJS**: Reactive programming library
+- **RxJS**: Reactive programming library with debounceTime and distinctUntilChanged operators
 - **SCSS**: Enhanced CSS with variables and mixins
 - **Node.js 18+**: JavaScript runtime for development
 - **npm**: Package management

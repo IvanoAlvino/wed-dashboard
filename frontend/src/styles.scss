@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 /* Global Styles */
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
@@ -95,4 +97,15 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   justify-content: center;
   align-items: center;
   height: 200px;
+}
+
+// Customize the entire app. Change :root to your selector if you want to scope the styles.
+:root {
+  @include mat.form-field-overrides((
+    outline-color: black,
+    input-text-color: black,
+    label-text-color: black,
+    hover-label-text-color: black,
+    hover-outline-color: black
+  ));
 }

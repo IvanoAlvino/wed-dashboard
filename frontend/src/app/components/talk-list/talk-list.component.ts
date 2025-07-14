@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { TalkService } from '../../services/talk.service';
 import { AuthService } from '../../services/auth.service';
 import { Talk, TalksByDate } from '../../models/talk.model';
@@ -17,11 +21,14 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
   standalone: true,
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     MatCardModule,
     MatChipsModule,
     MatIconModule,
     MatProgressSpinnerModule,
     MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
     StarRatingComponent
   ],
   animations: [
@@ -48,6 +55,28 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
     <div class="talk-list-container">
       <h1>WeAreDevelopers Conference Talks</h1>
       
+      <!-- Search Section -->
+      <div *ngIf="!loading && talksByDate" class="search-section">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search talks by title...</mat-label>
+          <input matInput [formControl]="searchControl">
+          <mat-icon matPrefix>search</mat-icon>
+          <button *ngIf="searchTerm" matSuffix mat-icon-button (click)="clearSearch()" type="button">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+        
+        <div *ngIf="searchTerm" class="search-results-info">
+          Found {{ getTotalFilteredTalks() }} talks matching "{{ searchTerm }}"
+        </div>
+        
+        <div *ngIf="searchTerm && getTotalFilteredTalks() === 0" class="no-results">
+          <mat-icon>search_off</mat-icon>
+          <p>No talks found matching "{{ searchTerm }}"</p>
+          <button mat-button (click)="clearSearch()">Clear search</button>
+        </div>
+      </div>
+      
       <div *ngIf="loading" class="loading-spinner">
         <mat-spinner></mat-spinner>
         <p>Loading talks...</p>
@@ -73,7 +102,7 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
               <div class="talk-main-info">
                 <div class="talk-time">{{ formatTime(talk.startTime) }}</div>
                 <div class="talk-details">
-                  <div class="talk-title">{{ talk.title }}</div>
+                  <div class="talk-title" [innerHTML]="highlightMatch(talk.title, searchTerm)"></div>
                   <div class="talk-speaker">by {{ talk.speaker }}</div>
                 </div>
                 <div class="talk-meta-inline">
@@ -131,6 +160,48 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
       padding: 20px;
       max-width: 1200px;
       margin: 0 auto;
+    }
+    
+    .search-section {
+      margin-bottom: 24px;
+      
+      .search-field {
+        width: 100%;
+      }
+      
+      .search-results-info {
+        margin-top: 8px;
+        color: #666;
+        font-size: 0.9em;
+        font-style: italic;
+      }
+      
+      .no-results {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+        
+        mat-icon {
+          font-size: 48px;
+          width: 48px;
+          height: 48px;
+          margin-bottom: 16px;
+          opacity: 0.5;
+        }
+        
+        p {
+          margin: 0 0 16px 0;
+          font-size: 1.1em;
+        }
+      }
+    }
+    
+    .search-highlight {
+      background-color: #ffeb3b;
+      font-weight: 600;
+      padding: 1px 2px;
+      border-radius: 2px;
+      color: #333;
     }
     
     .loading-spinner {
@@ -405,10 +476,15 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
 })
 export class TalkListComponent implements OnInit {
   talksByDate: TalksByDate | null = null;
+  filteredTalksByDate: TalksByDate | null = null;
   loading = true;
   expandedDays: Set<string> = new Set(['Day 1', 'Day 2', 'Day 3']); // All expanded by default
   expandedTalks: Set<number> = new Set();
   dayEntries: { dayName: string; date: string; talks: Talk[] }[] = [];
+  
+  // Search functionality
+  searchControl = new FormControl('');
+  searchTerm: string = '';
 
   constructor(
     private talkService: TalkService,
@@ -418,6 +494,7 @@ export class TalkListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTalks();
+    this.setupSearch();
   }
 
   loadTalks(): void {
@@ -425,7 +502,7 @@ export class TalkListComponent implements OnInit {
     this.talkService.getAllTalks().subscribe({
       next: (data) => {
         this.talksByDate = data;
-        this.dayEntries = this.buildDayEntries();
+        this.applySearch(); // Apply current search after loading
         this.loading = false;
       },
       error: (error) => {
@@ -515,6 +592,83 @@ export class TalkListComponent implements OnInit {
 
   openRecording(recordingUrl: string): void {
     window.open(recordingUrl, '_blank');
+  }
+
+  // Search functionality methods
+  private setupSearch(): void {
+    this.searchControl.valueChanges
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged()
+      )
+      .subscribe(searchTerm => {
+        this.searchTerm = searchTerm || '';
+        this.applySearch();
+      });
+  }
+
+  private applySearch(): void {
+    if (!this.talksByDate) {
+      return;
+    }
+
+    this.filteredTalksByDate = this.filterTalks(this.searchTerm);
+    this.dayEntries = this.buildDayEntriesFromFiltered();
+  }
+
+  private filterTalks(searchTerm: string): TalksByDate {
+    if (!searchTerm.trim()) {
+      return this.talksByDate || {};
+    }
+
+    const filtered: TalksByDate = {};
+    const normalizedSearch = searchTerm.toLowerCase();
+
+    Object.keys(this.talksByDate || {}).forEach(date => {
+      const matchingTalks = this.talksByDate![date].filter(talk =>
+        talk.title.toLowerCase().includes(normalizedSearch)
+      );
+      if (matchingTalks.length > 0) {
+        filtered[date] = matchingTalks;
+      }
+    });
+
+    return filtered;
+  }
+
+  private buildDayEntriesFromFiltered(): { dayName: string; date: string; talks: Talk[] }[] {
+    const dataToUse = this.filteredTalksByDate || this.talksByDate;
+    if (!dataToUse) {
+      return [];
+    }
+
+    const sortedDates = Object.keys(dataToUse).sort();
+
+    return sortedDates.map((date, index) => ({
+      dayName: `Day ${index + 1}`,
+      date,
+      talks: dataToUse[date].sort((a, b) =>
+        a.startTime.localeCompare(b.startTime)
+      )
+    }));
+  }
+
+  highlightMatch(text: string, searchTerm: string): string {
+    if (!searchTerm.trim()) return text;
+
+    const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return text.replace(regex, '<mark class="search-highlight">$1</mark>');
+  }
+
+  clearSearch(): void {
+    this.searchControl.setValue('');
+  }
+
+  getTotalFilteredTalks(): number {
+    const dataToUse = this.filteredTalksByDate || this.talksByDate;
+    if (!dataToUse) return 0;
+
+    return Object.values(dataToUse).reduce((total, talks) => total + talks.length, 0);
   }
 
   // Helper method to expose Object.keys to template

@@ -297,3 +297,64 @@ LocalDateTime.parse(dateTimeString, formatter)
 - Missing fields default to empty strings
 - Invalid datetime falls back to current time
 - Malformed JSON prevents application startup
+
+## Search Functionality Patterns
+
+### 1. Reactive Search Pattern
+**Real-time Filtering**: Client-side search with reactive programming
+```typescript
+searchControl.valueChanges
+  .pipe(
+    debounceTime(300),
+    distinctUntilChanged()
+  )
+  .subscribe(searchTerm => this.applySearch())
+```
+
+### 2. Debounced Input Pattern
+**Performance Optimization**: Prevents excessive processing
+- 300ms delay between keystrokes and search execution
+- `distinctUntilChanged()` prevents duplicate searches
+- Client-side filtering avoids API calls
+
+### 3. Dual Data Structure Pattern
+**Original and Filtered Data**: Maintains both states
+```typescript
+talksByDate: TalksByDate | null = null;           // Original data
+filteredTalksByDate: TalksByDate | null = null;   // Filtered results
+```
+
+### 4. Search Highlighting Pattern
+**Visual Feedback**: HTML highlighting of search terms
+```typescript
+highlightMatch(text: string, searchTerm: string): string {
+  const regex = new RegExp(`(${searchTerm})`, 'gi');
+  return text.replace(regex, '<mark class="search-highlight">$1</mark>');
+}
+```
+
+### 5. Search State Management Pattern
+**Centralized Search State**: Single source of truth
+- `searchControl`: FormControl for reactive form handling
+- `searchTerm`: Current search string for highlighting
+- `clearSearch()`: Reset functionality
+
+### 6. Preserved Functionality Pattern
+**Feature Compatibility**: All existing features work with filtered data
+- Rating system works on filtered results
+- Expand/collapse functionality preserved
+- Day grouping maintained in search results
+
+### 7. User Experience Patterns
+**Search Feedback**: Comprehensive user guidance
+- Result count display: "Found X talks matching 'term'"
+- No results state with clear search option
+- Visual highlighting of matched terms
+- Clear search button when active
+
+### 8. Case-Insensitive Search Pattern
+**Flexible Matching**: User-friendly search behavior
+```typescript
+const normalizedSearch = searchTerm.toLowerCase();
+talk.title.toLowerCase().includes(normalizedSearch)
+```
