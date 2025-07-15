@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Map;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -92,6 +93,6 @@ public class AuthController {
         user.setMustChangePassword(false);
         userRepository.save(user);
         
-        return ResponseEntity.ok("Password changed successfully!");
+        return ResponseEntity.ok(Map.of("message", "Password changed successfully!"));
     }
 }
