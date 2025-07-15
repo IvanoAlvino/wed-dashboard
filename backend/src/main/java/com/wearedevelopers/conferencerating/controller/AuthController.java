@@ -2,6 +2,7 @@ package com.wearedevelopers.conferencerating.controller;
 
 import com.wearedevelopers.conferencerating.dto.AuthRequest;
 import com.wearedevelopers.conferencerating.dto.AuthResponse;
+import com.wearedevelopers.conferencerating.dto.ChangePasswordRequest;
 import com.wearedevelopers.conferencerating.dto.RegisterRequest;
 import com.wearedevelopers.conferencerating.entity.User;
 import com.wearedevelopers.conferencerating.repository.UserRepository;
@@ -15,6 +16,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -44,7 +47,7 @@ public class AuthController {
         
         User user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow();
         
-        return ResponseEntity.ok(new AuthResponse(jwt, user.getId(), user.getUsername(), user.getEmail()));
+        return ResponseEntity.ok(new AuthResponse(jwt, user.getId(), user.getUsername(), user.getEmail(), user.isMustChangePassword()));
     }
     
     @PostMapping("/signup")
@@ -67,5 +70,28 @@ public class AuthController {
         userRepository.save(user);
         
         return ResponseEntity.ok("User registered successfully!");
+    }
+    
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest, Principal principal) {
+        String username = principal.getName();
+        User user = userRepository.findByUsername(username).orElseThrow();
+        
+        // Verify current password
+        if (!passwordEncoder.matches(changePasswordRequest.getCurrentPassword(), user.getPassword())) {
+            return ResponseEntity.badRequest().body("Error: Current password is incorrect!");
+        }
+        
+        // Verify new password confirmation
+        if (!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmPassword())) {
+            return ResponseEntity.badRequest().body("Error: New password and confirmation do not match!");
+        }
+        
+        // Update password and clear mustChangePassword flag
+        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+        user.setMustChangePassword(false);
+        userRepository.save(user);
+        
+        return ResponseEntity.ok("Password changed successfully!");
     }
 }

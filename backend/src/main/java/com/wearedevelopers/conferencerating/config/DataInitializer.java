@@ -30,13 +30,10 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         
-        // Create sample users if they don't exist
+        // Create conference attendee users if they don't exist
         if (userRepository.count() == 0) {
-            User user1 = new User("demo", "demo@example.com", passwordEncoder.encode("password"));
-            User user2 = new User("admin", "admin@example.com", passwordEncoder.encode("password"));
-            userRepository.save(user1);
-            userRepository.save(user2);
-            System.out.println("Sample users created successfully!");
+            createConferenceAttendees();
+            System.out.println("Conference attendee users created successfully!");
         }
         
         // Load talks from JSON if they don't exist
@@ -52,5 +49,39 @@ public class DataInitializer implements CommandLineRunner {
                 throw new RuntimeException("Failed to initialize conference data", e);
             }
         }
+    }
+    
+    private void createConferenceAttendees() {
+        String defaultPassword = "WED2025!temp";
+        
+        // Conference attendee list - replace with actual attendee data
+        String[][] attendees = {
+            {"Ivano Alvino", "ivano.alvino@navvis.com"},
+            {"Martin Friedli", "martin.friedli@navvis.com"},
+            {"Bruna Freitas", "bruna.freitas@navvis.com"},
+            {"Ilke Oender", "oenderilke.sever@navvis.com"},
+            {"Shashan", "kanishka.shashan@navvis.com"},
+            {"Arun Muthiyarkath", "arun.muthiyarkath@navvis.com"},
+            {"Atanas Georgiev", "atanas.georgiev@navvis.com"},
+            {"Aleksei Domozhirov", "aleksei.domozhirov@navvis.com"},
+            {"Elio Alvarado", "elio.alvarado@navvis.com"},
+            {"Maksim Trukhanavets", "maksim.trukhanavets@navvis.com"},
+            {"Manuel Kroeter", "manuel.kroeter@navvis.com"},
+            {"Moaz Mohamed", "moaz.mohamed@navvis.com"},
+            {"Ru Ko", "ru.ko@navvis.com"}
+        };
+        
+        for (String[] attendee : attendees) {
+            String fullName = attendee[0];
+            String email = attendee[1];
+            
+            User user = new User(email, email, passwordEncoder.encode(defaultPassword));
+            user.setFullName(fullName);
+            user.setMustChangePassword(true);
+            userRepository.save(user);
+        }
+        
+        System.out.println("Created " + attendees.length + " conference attendees with default password: " + defaultPassword);
+        System.out.println("All users must change their password on first login.");
     }
 }

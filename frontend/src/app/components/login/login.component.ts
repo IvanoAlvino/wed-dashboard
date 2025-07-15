@@ -44,9 +44,15 @@ export class LoginComponent {
       this.isLoading = true;
       
       this.authService.login(this.loginForm.value).subscribe({
-        next: () => {
+        next: (response) => {
           this.snackBar.open('Login successful!', 'Close', { duration: 3000 });
-          this.router.navigate(['/']);
+          
+          // Check if user must change password
+          if (response.mustChangePassword) {
+            this.router.navigate(['/change-password']);
+          } else {
+            this.router.navigate(['/']);
+          }
         },
         error: (error) => {
           this.isLoading = false;

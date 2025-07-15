@@ -21,6 +21,13 @@ export interface AuthResponse {
   id: number;
   username: string;
   email: string;
+  mustChangePassword: boolean;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 export interface RatingRequest {

@@ -7,12 +7,14 @@ public class AuthResponse {
     private Long id;
     private String username;
     private String email;
+    private boolean mustChangePassword;
     
-    public AuthResponse(String token, Long id, String username, String email) {
+    public AuthResponse(String token, Long id, String username, String email, boolean mustChangePassword) {
         this.token = token;
         this.id = id;
         this.username = username;
         this.email = email;
+        this.mustChangePassword = mustChangePassword;
     }
     
     public String getToken() {
@@ -53,5 +55,13 @@ public class AuthResponse {
     
     public void setEmail(String email) {
         this.email = email;
+    }
+    
+    public boolean isMustChangePassword() {
+        return mustChangePassword;
+    }
+    
+    public void setMustChangePassword(boolean mustChangePassword) {
+        this.mustChangePassword = mustChangePassword;
     }
 }

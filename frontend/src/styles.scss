@@ -109,3 +109,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     hover-outline-color: black
   ));
 }
+
+:root {
+  @include mat.card-overrides((
+    container-color: white
+  ));
+}

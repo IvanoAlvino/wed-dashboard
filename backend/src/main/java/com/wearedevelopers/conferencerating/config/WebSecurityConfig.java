@@ -60,7 +60,8 @@ public class WebSecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/auth/signin", "/api/auth/signup").permitAll()
+                .requestMatchers("/api/auth/change-password").authenticated()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/api/talks").permitAll()
                 .requestMatchers("/api/talks/**").permitAll()

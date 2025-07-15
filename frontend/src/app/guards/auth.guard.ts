@@ -13,3 +13,20 @@ export const authGuard = () => {
   router.navigate(['/login']);
   return false;
 };
+
+export const mainAppGuard = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (!authService.isLoggedIn()) {
+    router.navigate(['/login']);
+    return false;
+  }
+  
+  if (authService.mustChangePassword()) {
+    router.navigate(['/change-password']);
+    return false;
+  }
+  
+  return true;
+};

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { AuthRequest, AuthResponse, RegisterRequest, User } from '../models/user.model';
+import { AuthRequest, AuthResponse, ChangePasswordRequest, RegisterRequest, User } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +28,7 @@ export class AuthService {
       .pipe(
         tap(response => {
           localStorage.setItem('token', response.token);
+          localStorage.setItem('mustChangePassword', response.mustChangePassword.toString());
           const user: User = {
             id: response.id,
             username: response.username,
@@ -46,6 +47,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('mustChangePassword');
     this.currentUserSubject.next(null);
   }
 
@@ -59,5 +61,13 @@ export class AuthService {
 
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
+  }
+
+  changePassword(changePasswordRequest: ChangePasswordRequest): Observable<any> {
+    return this.http.post(`${this.API_URL}/auth/change-password`, changePasswordRequest);
+  }
+
+  mustChangePassword(): boolean {
+    return localStorage.getItem('mustChangePassword') === 'true';
   }
 }

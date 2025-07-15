@@ -32,6 +32,12 @@ public class User {
     @Size(min = 6, max = 100)
     private String password;
     
+    @Size(max = 100)
+    private String fullName;
+    
+    @Column(name = "must_change_password")
+    private boolean mustChangePassword = false;
+    
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     
@@ -89,6 +95,22 @@ public class User {
     
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+    
+    public String getFullName() {
+        return fullName;
+    }
+    
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+    
+    public boolean isMustChangePassword() {
+        return mustChangePassword;
+    }
+    
+    public void setMustChangePassword(boolean mustChangePassword) {
+        this.mustChangePassword = mustChangePassword;
     }
     
     public Set<Rating> getRatings() {
