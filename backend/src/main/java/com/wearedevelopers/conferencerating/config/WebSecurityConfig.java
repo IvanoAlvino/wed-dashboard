@@ -60,10 +60,14 @@ public class WebSecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/talks").permitAll()
-                .requestMatchers("/talks/**").permitAll()
+                .requestMatchers("/api/talks").permitAll()
+                .requestMatchers("/api/talks/**").permitAll()
+                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/static/**").permitAll()
+                .requestMatchers("/*.js", "/*.css", "/*.html", "/*.ico", "/*.png", "/*.jpg", "/*.gif").permitAll()
+                .requestMatchers("/", "/index.html").permitAll()
                 .anyRequest().authenticated()
             );
         
