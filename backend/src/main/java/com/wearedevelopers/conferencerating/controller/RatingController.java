@@ -3,6 +3,7 @@ package com.wearedevelopers.conferencerating.controller;
 import com.wearedevelopers.conferencerating.dto.RatingRequest;
 import com.wearedevelopers.conferencerating.dto.RatingResponse;
 import com.wearedevelopers.conferencerating.dto.TalkRatingResponse;
+import com.wearedevelopers.conferencerating.dto.TalkResponse;
 import com.wearedevelopers.conferencerating.dto.UserRatingResponse;
 import com.wearedevelopers.conferencerating.entity.Rating;
 import com.wearedevelopers.conferencerating.entity.Talk;
@@ -74,8 +75,9 @@ public class RatingController {
         
         Rating savedRating = ratingRepository.save(rating);
         
-        RatingResponse response = ratingMapper.toRatingResponse(savedRating);
-        return ResponseEntity.ok(response);
+        // Return updated talk response with new statistics
+        TalkResponse talkResponse = convertToTalkResponse(talk, user);
+        return ResponseEntity.ok(talkResponse);
     }
     
     @GetMapping("/user")
@@ -132,5 +134,36 @@ public class RatingController {
         
         ratingRepository.delete(rating);
         return ResponseEntity.ok("Rating deleted successfully");
+    }
+    
+    private TalkResponse convertToTalkResponse(Talk talk, User currentUser) {
+        TalkResponse response = new TalkResponse();
+        response.setId(talk.getId());
+        response.setTitle(talk.getTitle());
+        response.setSpeaker(talk.getSpeaker());
+        response.setDate(talk.getDate());
+        response.setStartTime(talk.getStartTime());
+        response.setEndTime(talk.getEndTime());
+        response.setDescription(talk.getDescription());
+        response.setTrack(talk.getTrack());
+        response.setRoom(talk.getRoom());
+        response.setRecordingUrl(talk.getRecordingUrl());
+        
+        // Add rating statistics
+        Double avgRating = ratingRepository.findAverageRatingByTalk(talk);
+        Long ratingCount = ratingRepository.countRatingsByTalk(talk);
+        
+        response.setAverageRating(avgRating);
+        response.setRatingCount(ratingCount);
+        
+        // Add current user's rating if authenticated
+        if (currentUser != null) {
+            Optional<Rating> userRating = ratingRepository.findByUserAndTalk(currentUser, talk);
+            if (userRating.isPresent()) {
+                response.setUserRating(userRating.get().getRating());
+            }
+        }
+        
+        return response;
     }
 }

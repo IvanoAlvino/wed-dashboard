@@ -160,11 +160,12 @@ export class TalkListComponent implements OnInit {
     };
 
     this.talkService.rateTalk(ratingRequest).subscribe({
-      next: () => {
-        talk.userRating = rating;
+      next: (updatedTalk) => {
+        // Update the talk with new statistics from the API response
+        talk.userRating = updatedTalk.userRating;
+        talk.averageRating = updatedTalk.averageRating;
+        talk.ratingCount = updatedTalk.ratingCount;
         this.snackBar.open('Rating saved!', 'Close', { duration: 2000 });
-        // Optionally reload talks to get updated average rating
-        this.loadTalks();
       },
       error: (error) => {
         this.snackBar.open('Failed to save rating', 'Close', { duration: 3000 });

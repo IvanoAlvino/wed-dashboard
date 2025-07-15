@@ -83,6 +83,20 @@ export class PopularTalksComponent implements OnInit {
     });
   }
 
+  private reloadRankingsQuietly(): void {
+    // Reload rankings without showing loading spinner to preserve UI state
+    this.talkService.getPopularTalks().subscribe({
+      next: (data) => {
+        this.talks = data;
+        this.applySearch(); // Reapply current search
+      },
+      error: (error) => {
+        // Silently handle errors to avoid disrupting user experience
+        console.error('Failed to reload rankings:', error);
+      }
+    });
+  }
+
   // Search functionality methods
   private setupSearch(): void {
     this.searchControl.valueChanges
@@ -160,11 +174,14 @@ export class PopularTalksComponent implements OnInit {
     };
 
     this.talkService.rateTalk(ratingRequest).subscribe({
-      next: () => {
-        talk.userRating = rating;
+      next: (updatedTalk) => {
+        // Update the talk with new statistics from the API response
+        talk.userRating = updatedTalk.userRating;
+        talk.averageRating = updatedTalk.averageRating;
+        talk.ratingCount = updatedTalk.ratingCount;
         this.snackBar.open('Rating saved!', 'Close', { duration: 2000 });
-        // Reload to get updated rankings
-        this.loadPopularTalks();
+        // Reload to get updated rankings without showing loading spinner
+        this.reloadRankingsQuietly();
       },
       error: (error) => {
         this.snackBar.open('Failed to save rating', 'Close', { duration: 3000 });

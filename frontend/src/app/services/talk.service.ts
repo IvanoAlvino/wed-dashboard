@@ -24,8 +24,8 @@ export class TalkService {
     return this.http.get<Talk>(`${this.API_URL}/talks/${id}`);
   }
 
-  rateTalk(ratingRequest: RatingRequest): Observable<any> {
-    return this.http.post(`${this.API_URL}/ratings`, ratingRequest);
+  rateTalk(ratingRequest: RatingRequest): Observable<Talk> {
+    return this.http.post<Talk>(`${this.API_URL}/ratings`, ratingRequest);
   }
 
   getUserRatings(): Observable<any[]> {
