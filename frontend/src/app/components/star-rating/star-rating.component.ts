@@ -11,7 +11,6 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class StarRatingComponent {
   @Input() rating: number = 0;
-  @Input() interactive: boolean = false;
   @Input() size: 'normal' | 'small' = 'normal';
   @Output() ratingChange = new EventEmitter<number>();
 
@@ -19,21 +18,15 @@ export class StarRatingComponent {
   hoveredRating = 0;
 
   onStarClick(rating: number): void {
-    if (this.interactive) {
-      this.rating = rating;
-      this.ratingChange.emit(rating);
-    }
+    this.rating = rating;
+    this.ratingChange.emit(rating);
   }
 
   onStarHover(rating: number): void {
-    if (this.interactive) {
-      this.hoveredRating = rating;
-    }
+    this.hoveredRating = rating;
   }
 
   onStarLeave(): void {
-    if (this.interactive) {
-      this.hoveredRating = 0;
-    }
+    this.hoveredRating = 0;
   }
 }

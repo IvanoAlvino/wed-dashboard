@@ -23,17 +23,17 @@
 }
 
 .star.filled {
-  color: #ffd700;
+  color: #d1551b;
 }
 
 .star.hover {
-  color: #ffed4e;
+  color: #d1551b;
 }
 
-.star.interactive {
+.star {
   cursor: pointer;
 }
 
-.star.interactive:hover {
+.star:hover {
   transform: scale(1.1);
 }

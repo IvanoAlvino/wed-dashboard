@@ -73,7 +73,6 @@
                 <div *ngIf="isLoggedIn()" class="user-rating-inline">
                   <app-star-rating 
                     [rating]="talk.userRating || 0"
-                    [interactive]="true"
                     [size]="'small'"
                     (ratingChange)="onRatingChange(talk, $event)">
                   </app-star-rating>

@@ -3,11 +3,10 @@
     *ngFor="let star of stars; let i = index"
     class="star"
     [class.filled]="i < rating"
-    [class.hover]="interactive && i < hoveredRating"
-    [class.interactive]="interactive"
-    (click)="interactive && onStarClick(i + 1)"
-    (mouseenter)="interactive && onStarHover(i + 1)"
-    (mouseleave)="interactive && onStarLeave()">
+    [class.hover]="i < hoveredRating"
+    (click)="onStarClick(i + 1)"
+    (mouseenter)="onStarHover(i + 1)"
+    (mouseleave)="onStarLeave()">
     {{ i < rating ? 'star' : 'star_border' }}
   </mat-icon>
 </div>
