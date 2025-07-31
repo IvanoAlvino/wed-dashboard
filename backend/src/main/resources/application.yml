@@ -20,8 +20,8 @@ spring:
         
   security:
     jwt:
-      secret: bXlTZWNyZXRLZXlGb3JKV1RUb2tlbkdlbmVyYXRpb25BbmRWYWxpZGF0aW9u
-      expiration: 86400000 # 24 hours
+      secret: ${JWT_SECRET:bXlTZWNyZXRLZXlGb3JKV1RUb2tlbkdlbmVyYXRpb25BbmRWYWxpZGF0aW9u}
+      expiration: ${JWT_EXPIRATION:86400000} # 24 hours
 
 # Actuator endpoints for health checks
 management:
@@ -34,7 +34,7 @@ management:
       show-details: when-authorized
 
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 logging:
   level:
