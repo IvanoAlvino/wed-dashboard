@@ -8,7 +8,7 @@ import { RatingRequest } from '../models/user.model';
   providedIn: 'root'
 })
 export class TalkService {
-  private readonly API_URL = 'http://localhost:8080/api';
+  private readonly API_URL = '/api';
 
   constructor(private http: HttpClient) {}
 
