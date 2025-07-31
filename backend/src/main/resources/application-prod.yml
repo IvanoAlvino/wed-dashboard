@@ -16,7 +16,7 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
-# Production actuator settings
+# Production actuator settings optimized for Railway
 management:
   endpoints:
     web:
@@ -25,3 +25,14 @@ management:
   endpoint:
     health:
       show-details: never
+  metrics:
+    enable:
+      # Disable system metrics that cause container issues
+      system: false
+      process: false
+      jvm: false
+  # Disable automatic metric collection that fails in containers
+  metric:
+    export:
+      simple:
+        enabled: false
