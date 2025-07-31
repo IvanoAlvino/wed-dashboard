@@ -5,6 +5,11 @@ spring:
     properties:
       hibernate:
         format_sql: false
+  # Disable problematic autoconfiguration classes
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.actuate.autoconfigure.metrics.SystemMetricsAutoConfiguration
+      - org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration
         
 # Optimized logging for production
 logging:
@@ -16,23 +21,16 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
-# Production actuator settings optimized for Railway
+# Completely disable Spring Boot Actuator for Railway deployment
 management:
   endpoints:
-    web:
-      exposure:
-        include: health
+    enabled-by-default: false
   endpoint:
     health:
-      show-details: never
+      enabled: false
   metrics:
     enable:
-      # Disable system metrics that cause container issues
-      system: false
-      process: false
-      jvm: false
-  # Disable automatic metric collection that fails in containers
-  metric:
+      root: false
     export:
-      simple:
+      defaults:
         enabled: false
